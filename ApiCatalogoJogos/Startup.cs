@@ -1,4 +1,5 @@
 using ApiCatalogoJogos.Controllers.V1;
+using ApiCatalogoJogos.Middleware;
 using ApiCatalogoJogos.Repositories;
 using ApiCatalogoJogos.Services;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +39,7 @@ namespace ApiCatalogoJogos
             services.AddScoped<IExemploScoped, ExemploCicloDeVida>();
             services.AddTransient<IExemploTransient, ExemploCicloDeVida>();
 
+           
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -58,6 +60,8 @@ namespace ApiCatalogoJogos
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApiCatalogoJogos v1"));
             }
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 
