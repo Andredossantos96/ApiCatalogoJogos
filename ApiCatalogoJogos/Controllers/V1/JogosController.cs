@@ -1,4 +1,5 @@
-﻿using ApiCatalogoJogos.InputModel;
+﻿using ApiCatalogoJogos.Exceptions;
+using ApiCatalogoJogos.InputModel;
 using ApiCatalogoJogos.Services;
 using ApiCatalogoJogos.ViewModel;
 using Microsoft.AspNetCore.Http;
@@ -15,17 +16,17 @@ namespace ApiCatalogoJogos.Controllers.V1
     [ApiController]
     public class JogosController : ControllerBase
     {
-        private readonly IJogoService jogoService;
+        private readonly IJogoService _jogoService;
 
         public JogosController(IJogoService jogoService)
         {
-            this.jogoService = jogoService;
+            _jogoService = jogoService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<JogoViewModel>>> Obter([FromQuery, Range(1, int.MaxValue)] int pagina = 1, [FromQuery, Range(1, 50)] int quantidade =5)
+        public async Task<ActionResult<IEnumerable<JogoViewModel>>> Obter([FromQuery, Range(1, int.MaxValue)] int pagina = 1, [FromQuery, Range(1, 50)] int quantidade = 5)
         {
-            var jogos = await jogoService.Obter(pagina, quantidade);
+            var jogos = await _jogoService.Obter(pagina, quantidade);
 
             if (jogos.Count() == 0)
                 return NoContent();
@@ -36,47 +37,42 @@ namespace ApiCatalogoJogos.Controllers.V1
         [HttpGet("{idJogo:guid}")]
         public async Task<ActionResult<JogoViewModel>> Obter([FromRoute] Guid idJogo)
         {
-            var jogo = await jogoService.Obter(idJogo);
+            var jogo = await _jogoService.Obter(idJogo);
 
             if (jogo == null)
                 return NoContent();
 
-            return Ok();
+            return Ok(jogo);
         }
-
 
         [HttpPost]
         public async Task<ActionResult<JogoViewModel>> InserirJogo([FromBody] JogoInputModel jogoInputModel)
         {
             try
             {
-                var jogo = await jogoService.Inserir(jogoInputModel);
+                var jogo = await _jogoService.Inserir(jogoInputModel);
 
-                return Ok();
+                return Ok(jogo);
             }
-            //catch (JogoJaCadastradoException ex)
-            catch(Exception ex)
+            catch (JogoJaCadastradoException ex)
             {
                 return UnprocessableEntity("Já existe um jogo com este nome para esta produtora");
             }
         }
 
         [HttpPut("{idJogo:guid}")]
-        public async Task<ActionResult> AtualizarJogo([FromRoute] Guid idJogo, JogoInputModel jogoInputModel)
+        public async Task<ActionResult> AtualizarJogo([FromRoute] Guid idJogo, [FromBody] JogoInputModel jogoInputModel)
         {
             try
             {
-                await jogoService.Atualizar(idJogo, jogoInputModel);
+                await _jogoService.Atualizar(idJogo, jogoInputModel);
 
                 return Ok();
             }
-            //catch (JogoNaoCadastradoException ex)
-            catch (Exception ex)
+            catch (JogoNaoCadastradoException ex)
             {
                 return NotFound("Não existe este jogo");
             }
-
-
         }
 
         [HttpPatch("{idJogo:guid}/preco/{preco:double}")]
@@ -84,30 +80,26 @@ namespace ApiCatalogoJogos.Controllers.V1
         {
             try
             {
-                await jogoService.Atualizar(idJogo, preco);
+                await _jogoService.Atualizar(idJogo, preco);
 
                 return Ok();
             }
-            //catch (JogoNaoCadastradoException ex)
-            catch (Exception ex)
+            catch (JogoNaoCadastradoException ex)
             {
                 return NotFound("Não existe este jogo");
             }
-
-
         }
 
-        [HttpDelete]
+        [HttpDelete("{idJogo:guid}")]
         public async Task<ActionResult> ApagarJogo([FromRoute] Guid idJogo)
         {
             try
             {
-                await jogoService.Remover(idJogo);
+                await _jogoService.Remover(idJogo);
 
                 return Ok();
             }
-            //catch (JogoNaoCadastradoException ex)
-            catch (Exception ex)
+            catch (JogoNaoCadastradoException ex)
             {
                 return NotFound("Não existe este jogo");
             }
