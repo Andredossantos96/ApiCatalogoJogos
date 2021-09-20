@@ -19,7 +19,6 @@ namespace ApiCatalogoJogos.Services
             _jogoRepository = jogoRepository;
         }
 
-
         public async Task<List<JogoViewModel>> Obter(int pagina, int quantidade)
         {
             var jogos = await _jogoRepository.Obter(pagina, quantidade);
@@ -30,10 +29,10 @@ namespace ApiCatalogoJogos.Services
                 Nome = jogo.Nome,
                 Produtora = jogo.Produtora,
                 Preco = jogo.Preco
-            }).ToList();
+            })
+                               .ToList();
         }
 
-     
         public async Task<JogoViewModel> Obter(Guid id)
         {
             var jogo = await _jogoRepository.Obter(id);
@@ -81,7 +80,7 @@ namespace ApiCatalogoJogos.Services
             var entidadeJogo = await _jogoRepository.Obter(id);
 
             if (entidadeJogo == null)
-                throw new JogoJaCadastradoException();
+                throw new JogoNaoCadastradoException();
 
             entidadeJogo.Nome = jogo.Nome;
             entidadeJogo.Produtora = jogo.Produtora;
@@ -95,7 +94,7 @@ namespace ApiCatalogoJogos.Services
             var entidadeJogo = await _jogoRepository.Obter(id);
 
             if (entidadeJogo == null)
-                throw new JogoJaCadastradoException();
+                throw new JogoNaoCadastradoException();
 
             entidadeJogo.Preco = preco;
 
@@ -107,14 +106,14 @@ namespace ApiCatalogoJogos.Services
             var jogo = await _jogoRepository.Obter(id);
 
             if (jogo == null)
-                throw new JogoJaCadastradoException();
-       
+                throw new JogoNaoCadastradoException();
+
             await _jogoRepository.Remover(id);
         }
 
         public void Dispose()
         {
             _jogoRepository?.Dispose();
-        }     
+        }
     }
 }

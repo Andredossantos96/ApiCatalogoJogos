@@ -4,19 +4,13 @@ using ApiCatalogoJogos.Repositories;
 using ApiCatalogoJogos.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace ApiCatalogoJogos
 {
@@ -33,13 +27,16 @@ namespace ApiCatalogoJogos
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IJogoService, JogoService>();
-            services.AddScoped<IJogoRepository, JogoSqlServerRepository>();
+            services.AddScoped<IJogoRepository, JogoRepository>();
+
+            #region CicloDeVida
 
             services.AddSingleton<IExemploSingleton, ExemploCicloDeVida>();
             services.AddScoped<IExemploScoped, ExemploCicloDeVida>();
             services.AddTransient<IExemploTransient, ExemploCicloDeVida>();
 
-           
+            #endregion
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
